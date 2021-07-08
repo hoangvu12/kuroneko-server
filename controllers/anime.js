@@ -48,12 +48,12 @@ class HENTAIZ {
       .toArray();
 
     const videos = $(selectors.videosContainer)
-      .map(function (_, i) {
+      .toArray()
+      .map(function (e, i) {
         return {
-          videos: parseList($),
+          videos: parseList($(e).find(selectors.list), $),
         };
-      })
-      .toArray();
+      });
 
     const sections = [];
 
@@ -113,7 +113,7 @@ class HENTAIZ {
         name: $(e).find("a").text().trim(),
         slug: parseSlug($(e).find("a").attr("href")),
       }));
-    const related = parseList($);
+    const related = parseList($(selectors.list), $);
 
     const source = parseVideoSource($(selectors.player).attr("src"));
 
@@ -161,7 +161,7 @@ class HENTAIZ {
       .trim();
 
     const description = $(selectors.searchForm).find("p").text().trim();
-    const data = parseList($);
+    const data = parseList($(selectors.list), $);
 
     const pages = Number(total / LIST_PER_PAGE).round();
 
@@ -207,15 +207,13 @@ const getImageUrl = (url) => {
   return isValidUrl(url) ? url : `${BASE_URL}${url}`;
 };
 
-const parseList = ($) => {
-  return $(selectors.list)
-    .toArray()
-    .map((e) => ({
-      image: getImageUrl($(e).find("img").data("src")),
-      slug: parseSlug($(e).find(".card-title a").attr("href")),
-      title: $(e).find(".card-title a").text().trim(),
-      studios: [$(e).find(".card-body div").text().trim()],
-    }));
+const parseList = (cheerioNode, $) => {
+  return cheerioNode.toArray().map((e) => ({
+    image: getImageUrl($(e).find("img").data("src")),
+    slug: parseSlug($(e).find(".card-title a").attr("href")),
+    title: $(e).find(".card-title a").text().trim(),
+    studios: [$(e).find(".card-body div").text().trim()],
+  }));
 };
 
 const parseSlug = (url) => {
